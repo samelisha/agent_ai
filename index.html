@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Elisha's Chat</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f5f5f5;
+      display: flex;
+      justify-content: center;
+      padding-top: 40px;
+    }
+    #chat {
+      width: 400px;
+      background: white;
+      border-radius: 8px;
+      padding: 16px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+    #messages {
+      height: 300px;
+      overflow-y: auto;
+      border: 1px solid #ddd;
+      padding: 8px;
+      margin-bottom: 10px;
+    }
+    .user { color: blue; margin-bottom: 6px; }
+    .bot { color: green; margin-bottom: 6px; }
+    input {
+      width: 100%;
+      padding: 8px;
+    }
+  </style>
+</head>
+<body>
+
+<div id="chat">
+  <h3>Elisha's Chat</h3>
+  <div id="messages"></div>
+  <input id="input" placeholder="Type a message and press Enter..." />
+</div>
+
+<script>
+  const sessionId = "web-session-1";
+  const messagesDiv = document.getElementById("messages");
+  const input = document.getElementById("input");
+
+  function addMessage(text, className) {
+    const div = document.createElement("div");
+    div.className = className;
+    div.textContent = text;
+    messagesDiv.appendChild(div);
+    messagesDiv.scrollTop = messagesDiv.scrollHeight;
+  }
+
+  input.addEventListener("keypress", async (e) => {
+    if (e.key === "Enter" && input.value.trim()) {
+      const text = input.value;
+      input.value = "";
+
+      addMessage("You: " + text, "user");
+
+      const response = await fetch("http://127.0.0.1:8000/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          session_id: sessionId,
+          message: text
+        })
+      });
+
+      const data = await response.json();
+      addMessage("Bot: " + data.response, "bot");
+    }
+  });
+</script>
+
+</body>
+</html>
+
